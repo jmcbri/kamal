@@ -127,6 +127,7 @@ class Kamal::Cli::Accessory < Kamal::Cli::Base
 
   desc "details [NAME]", "Show details about accessory on host (use NAME=all to show all accessories)"
   def details(name)
+    puts "Here1"
     if name == "all"
       KAMAL.accessory_names.each { |accessory_name| details(accessory_name) }
     else

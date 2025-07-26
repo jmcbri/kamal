@@ -92,6 +92,7 @@ class Kamal::Cli::App < Kamal::Cli::Base
   # FIXME: Drop in favor of just containers?
   desc "details", "Show details about app containers"
   def details
+    puts "Here2"
     on(KAMAL.app_hosts) do |host|
       roles = KAMAL.roles_on(host)
 

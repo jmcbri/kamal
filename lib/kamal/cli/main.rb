@@ -102,6 +102,7 @@ class Kamal::Cli::Main < Kamal::Cli::Base
 
   desc "details", "Show details about all containers"
   def details
+    puts "Here4"
     invoke "kamal:cli:proxy:details"
     invoke "kamal:cli:app:details"
     invoke "kamal:cli:accessory:details", [ "all" ]

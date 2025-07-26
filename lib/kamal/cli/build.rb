@@ -111,6 +111,7 @@ class Kamal::Cli::Build < Kamal::Cli::Base
 
   desc "details", "Show build setup"
   def details
+    puts "Here3"
     run_locally do
       puts "Builder: #{KAMAL.builder.name}"
       puts capture(*KAMAL.builder.info)
