@@ -197,6 +197,7 @@ class Kamal::Cli::Proxy < Kamal::Cli::Base
 
   desc "details", "Show details about proxy container from servers"
   def details
+    echo "here"
     on(KAMAL.proxy_hosts) { |host| puts_by_host host, capture_with_info(*KAMAL.proxy.info), type: "Proxy" }
   end
 
