@@ -105,6 +105,13 @@ class Kamal::Commands::Proxy < Kamal::Commands::Base
     remove_file config.proxy_boot.run_command_file
   end
 
+  def force_new_cerificate
+    # [ :echo, "#{substitute(read_boot_options)} #{substitute(read_image)}:#{substitute(read_image_version)} #{substitute(read_run_command)}" ]
+      # combine [ :cat, file, "2>", "/dev/null" ], [ :echo, "\"#{default}\"" ], by: "||"
+    # remove_file config.proxy_boot.run_command_file
+      combine [ :ls, file, "2>", "/dev/null" ], [ :echo, "\"#{default}\"" ], by: "&&"
+  end
+
   private
     def container_name
       config.proxy_boot.container_name

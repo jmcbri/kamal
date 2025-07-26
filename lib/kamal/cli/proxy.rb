@@ -200,6 +200,19 @@ class Kamal::Cli::Proxy < Kamal::Cli::Base
     on(KAMAL.proxy_hosts) { |host| puts_by_host host, capture_with_info(*KAMAL.proxy.info), type: "Proxy" }
   end
 
+  desc "force_new_cerificate", "Force the generation of a new TSL certificate, which will cause a restart."
+  def force_new_cerificate
+    # https://letsencrypt.org/docs/rate-limits/
+    confirming "This will cause a brief outage on each host, and invoke Lets Encrypt rate limits if overused. Are you sure?" do
+      with_lock do
+        on(KAMAL.proxy_hosts) do |host|
+          execute *KAMAL.proxy.auditor.record("Forcing certificate renewal"), verbosity: :debug
+          execute *KAMAL.proxy.force_new_cerificate, raise_on_non_zero_exit: false
+        end
+      end
+    end
+  end
+
   desc "logs", "Show log lines from proxy on servers"
   option :since, aliases: "-s", desc: "Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)"
   option :lines, type: :numeric, aliases: "-n", desc: "Number of log lines to pull from each server"
@@ -269,22 +282,22 @@ class Kamal::Cli::Proxy < Kamal::Cli::Base
   end
 
   private
-    def removal_allowed?(force)
-      on(KAMAL.proxy_hosts) do |host|
-        app_count = capture_with_info(*KAMAL.server.app_directory_count).chomp.to_i
-        raise "The are other applications installed on #{host}" if app_count > 0
-      end
-
-      true
-    rescue SSHKit::Runner::ExecuteError => e
-      raise unless e.message.include?("The are other applications installed on")
-
-      if force
-        say "Forcing, so removing the proxy, even though other apps are installed", :magenta
-      else
-        say "Not removing the proxy, as other apps are installed, ignore this check with kamal proxy remove --force", :magenta
-      end
-
-      force
+  def removal_allowed?(force)
+    on(KAMAL.proxy_hosts) do |host|
+      app_count = capture_with_info(*KAMAL.server.app_directory_count).chomp.to_i
+      raise "The are other applications installed on #{host}" if app_count > 0
     end
+
+    true
+  rescue SSHKit::Runner::ExecuteError => e
+    raise unless e.message.include?("The are other applications installed on")
+
+    if force
+      say "Forcing, so removing the proxy, even though other apps are installed", :magenta
+    else
+      say "Not removing the proxy, as other apps are installed, ignore this check with kamal proxy remove --force", :magenta
+    end
+
+    force
+  end
 end
